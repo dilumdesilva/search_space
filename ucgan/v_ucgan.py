@@ -16,7 +16,7 @@ from keras.layers import Dropout
 from utils.data_loader import DataLoader
 
 # define the standalone discriminator model
-def define_discriminator(in_shape=(28, 28, 1)):
+def define_discriminator(in_shape=(128, 128, 1)):
     model = Sequential()
     # downsample
     model.add(Conv2D(128, (3, 3), strides=(2, 2), padding='same', input_shape=in_shape))
@@ -35,21 +35,44 @@ def define_discriminator(in_shape=(28, 28, 1)):
 
 
 # define the standalone generator model
+# def define_generator(latent_dim):
+#     model = Sequential()
+#     # foundation for 7x7 image
+#     n_nodes = 128 * 7 * 7
+#     model.add(Dense(n_nodes, input_dim=latent_dim))
+#     model.add(LeakyReLU(alpha=0.2))
+#     model.add(Reshape((7, 7, 128)))
+#     # upsample to 14x14
+#     model.add(Conv2DTranspose(128, (4, 4), strides=(2, 2), padding='same'))
+#     model.add(LeakyReLU(alpha=0.2))
+#     # upsample to 28x28
+#     model.add(Conv2DTranspose(128, (4, 4), strides=(2, 2), padding='same'))
+#     model.add(LeakyReLU(alpha=0.2))
+#     # generate
+#     model.add(Conv2D(1, (7, 7), activation='tanh', padding='same'))
+#     return model
+
 def define_generator(latent_dim):
     model = Sequential()
     # foundation for 7x7 image
-    n_nodes = 128 * 7 * 7
+    n_nodes = 128 * 8 * 8
     model.add(Dense(n_nodes, input_dim=latent_dim))
     model.add(LeakyReLU(alpha=0.2))
-    model.add(Reshape((7, 7, 128)))
-    # upsample to 14x14
+    model.add(Reshape((8, 8, 128)))
+    # upsample to 16x16
     model.add(Conv2DTranspose(128, (4, 4), strides=(2, 2), padding='same'))
     model.add(LeakyReLU(alpha=0.2))
-    # upsample to 28x28
+    # upsample to 32x32
+    model.add(Conv2DTranspose(128, (4, 4), strides=(2, 2), padding='same'))
+    model.add(LeakyReLU(alpha=0.2))
+    # upsample to 64x64
+    model.add(Conv2DTranspose(128, (4, 4), strides=(2, 2), padding='same'))
+    model.add(LeakyReLU(alpha=0.2))
+    # upsample to 128x128
     model.add(Conv2DTranspose(128, (4, 4), strides=(2, 2), padding='same'))
     model.add(LeakyReLU(alpha=0.2))
     # generate
-    model.add(Conv2D(1, (7, 7), activation='tanh', padding='same'))
+    model.add(Conv2D(1, (8, 8), activation='tanh', padding='same'))
     return model
 
 
@@ -114,7 +137,7 @@ def generate_fake_samples(generator, latent_dim, n_samples):
 
 
 # train the generator and discriminator
-def train(g_model, d_model, gan_model, dataset, latent_dim, n_epochs=100, n_batch=128):
+def train(g_model, d_model, gan_model, dataset, latent_dim, n_epochs=100, n_batch=50):
     bat_per_epo = int(dataset.shape[0] / n_batch)
     half_batch = int(n_batch / 2)
     # manually enumerate epochs
