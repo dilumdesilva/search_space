@@ -23,7 +23,7 @@ def show_plot(examples, n):
     pyplot.show()
 
 # load model
-model = load_model('generator.h5')
+model = load_model('128_50BATCH_generator.h5')
 # generate images
 latent_points = generate_latent_points(100, 100)
 # generate images
